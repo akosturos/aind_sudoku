@@ -77,14 +77,14 @@ def naked_twins(values):
     while not no_more_twins:
         board_values = values
         for unit in row_units + col_units + square_units:
-            n_t_poss = [(box, values[box]) for box in unit if len(values[box]) == 2]  
+            n_t_poss = []
+            for box in unit if len(values[box]) == 2:
+                n_t_poss.append([[box],[values[box]])
             for item in n_t_poss:
                 for comparison in n_t_poss:
                     if n_t_poss[item][1] == n_t_poss[comparison][1]:
                         if item != comparison:
-                            n_t_boxes = []
-                            n_t_boxes.append(n_t_poss[item][0])
-                            n_t_boxes.append(n_t_poss[comparison][0])
+                            n_t_boxes = [n_t_poss[item][0], n_t_poss[comparison][0])
                             n_t_values = n_t_poss[item][1]
                             for comp in unit:
                                 if comp in n_t_boxes:
