@@ -73,26 +73,28 @@ def naked_twins(values):
                                 assign_value(values, box, values[box].replace(naked_twins_vals[1], ''))
     return values
     """
-    no_more_twins = False
-    while not no_more_twins:
-        board_values = values
-        for unit in row_units + col_units + square_units:
-            n_t_poss = []
-            for box in unit if len(values[box]) == 2:
-                n_t_poss.append([[box],[values[box]])
+    no_more_twins = False #set up while loop validation
+
+    while not no_more_twins: #while loop
+        board_values = values #test values of board
+
+        for unit in row_units + col_units + square_units: #test values in unitlist minus diagonals
+            n_t_poss = [(box, values[box]) for box in unit if len(values[box]) == 2]
+            #values in n_t_poss are all boxes with two values
             for item in n_t_poss:
                 for comparison in n_t_poss:
-                    if n_t_poss[item][1] == n_t_poss[comparison][1]:
-                        if item != comparison:
-                            n_t_boxes = [n_t_poss[item][0], n_t_poss[comparison][0])
+                    if item[1] == comparison[1]:
+                        if item[0] != comparison[0]:
+                            n_t_boxes=[item[0], comparison[0]]
                             n_t_values = n_t_poss[item][1]
-                            for comp in unit:
-                                if comp in n_t_boxes:
-                                    assign_value(values, comp, n_t_values)
+                            for b in unit:
+                                if b in n_t_boxes:
+                                    assign_value(values, b, n_t_values)
                                 else:
                                     for digit in n_t_values:
-                                        assign_value(values, comp, values[comp].replace(digit, ''))
-                                   
+                                        assign_value(values, b, values[comp].replace(digit, ''))
+                            n_t_boxes.remove(item[0])
+                            n_t_boxes.remove(comparison[0])
     return values
 
 
@@ -201,7 +203,7 @@ def solve(grid):
     values = grid_values(grid)
     return search(values)
 
-    
+
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(solve(diag_sudoku_grid))
