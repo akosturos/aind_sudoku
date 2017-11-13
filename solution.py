@@ -20,32 +20,7 @@ unitlist = row_units + col_units + square_units + diagonal_up + diagonal_down
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s], []))-set([s])) for s in boxes)
 
-'''
-#old code
-def add_diagonal_play():
-    """
-    Use this function to add the diagonal values into the peer groups of each
-    member of the diagonal family
-    """
-    # create diagonal values
-    diag_down_helper = [cross(rows[i], str(i+1)) for i in range(0,9)]
-    diag_up_helper = [cross(rows_reversed[ii], str(9-ii)) for ii in range(0, 9)]
-    diag_down = []
-    diag_up = []
-    for item in diag_down_helper:
-        diag_down.extend(item)  
-    for item in diag_up_helper:
-        diag_up.extend(item)
-    diag_down = set(diag_down)
-    diag_up = set(diag_up)
-    #add diagonals to peers set
-    for item in diag_down:
-        peers[item].update(diag_down)
-        peers[item].remove(item)
-    for item in diag_up:
-        peers[item].update(diag_up)
-        peers[item].remove(item)
-'''
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -69,30 +44,52 @@ def naked_twins(values):
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
 
+
+    no_more_twins = False
+    while not no_more_twins:
+        board_values = values
+        for unit in row_units + col_units + square_units:
+            naked_twins_dict = dict()
+            for digit in cols:
+                # create concatenated list of boxes that have value
+                boxes_found = ''.join([box for box in unit if digit in values[box]])
+                # check if len == 4, meaning there are two boxes, and if yes insert in dict
+                if len(boxes_found) == 4:
+                    # check if in dict, if not it is first value
+                    if(boxes_found not in naked_twins_dict.keys()):
+                        naked_twins_dict[boxes_found] = digit
+                    # if in dict, we have found a naked twins (we do not have to worry about
+                    #       three values in the naked dict logic, because it is logically
+                    #       impossible to two values for three places
+                    else:
+                        naked_twins_vals = naked_twins_dict[boxes_found] + digit
+                        for box in unit:
+                            if(box in boxes_found):
+                                #naked twins
+                                assign_value(values, box, naked_twins_vals)
+                            else:
+                                #remove naked twins values from same unit
+                                assign_value(values, box, values[box].replace(naked_twins_vals[0], ''))
+                                assign_value(values, box, values[box].replace(naked_twins_vals[1], ''))
+    return values
     """
-    for unit in row_units + col_units + square_units:
-        naked_twins_dict = dict()
-        for digit in cols:
-            # create concatenated list of boxes that have value
-            boxes_found = ''.join([box for box in unit if digit in values[box]])
-            # check if len == 4, meaning there are two boxes, and if yes insert in dict
-            if len(boxes_found) == 4:
-                # check if in dict, if not it is first value
-                if(boxes_found not in naked_twins_dict.keys()):
-                    naked_twins_dict[boxes_found] = digit
-                # if in dict, we have found a naked twins (we do not have to worry about
-                #       three values in the naked dict logic, because it is logically
-                #       impossible to two values for three places
-                else:
-                    naked_twins_vals = naked_twins_dict[boxes_found] + digit
-                    for box in unit:
-                        if(box in boxes_found):
-                            #naked twins
-                            assign_value(values, box, naked_twins_vals)
-                        else:
-                            #remove naked twins values from same unit
-                            assign_value(values, box, values[box].replace(naked_twins_vals[0], ''))
-                            assign_value(values, box, values[box].replace(naked_twins_vals[1], ''))
+    no_more_twins = False
+    while not no_more_twins:
+        board_values = values
+        for unit in row_units + col_units + square_units:
+            n_t_poss = [(box, values[box]) for box in unit if len(values[box]) == 2]  
+            for item in n_t_poss:
+                for comparison in n_t_poss:
+                    if n_t_poss[item][1] == n_t_poss[comparison][1]:
+                        if item != comparison:
+                            n_t_boxes, n_t_values = (n_t_poss[item][0], n_t_poss[comparison][0]), n_t_poss[item][1]
+                            for comp in unit:
+                                if comp in n_t_boxes:
+                                    assign_value(values, comp, n_t_values)
+                                else:
+                                    for digit in n_t_values:
+                                        assign_value(values, comp, values[comp].replace(digit, ''))
+                                   
     return values
 
 
