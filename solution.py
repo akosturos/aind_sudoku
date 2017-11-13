@@ -82,7 +82,10 @@ def naked_twins(values):
                 for comparison in n_t_poss:
                     if n_t_poss[item][1] == n_t_poss[comparison][1]:
                         if item != comparison:
-                            n_t_boxes, n_t_values = (n_t_poss[item][0], n_t_poss[comparison][0]), n_t_poss[item][1]
+                            n_t_boxes = []
+                            n_t_boxes.append(n_t_poss[item][0])
+                            n_t_boxes.append(n_t_poss[comparison][0])
+                            n_t_values = n_t_poss[item][1]
                             for comp in unit:
                                 if comp in n_t_boxes:
                                     assign_value(values, comp, n_t_values)
